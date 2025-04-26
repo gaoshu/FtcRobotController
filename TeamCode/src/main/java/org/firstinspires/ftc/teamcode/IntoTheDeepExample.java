@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Into the deep example", group="Iterative OpMode")
-@Disabled
+//@Disabled
 public class IntoTheDeepExample extends OpMode
 {
     // Declare OpMode members.
