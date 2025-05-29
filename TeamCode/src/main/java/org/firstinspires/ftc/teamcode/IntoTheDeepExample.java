@@ -135,8 +135,8 @@ public class IntoTheDeepExample extends OpMode
 
         // Arm y:collect, a:fold; Wrist x: fold in, b: fold out
         if (gamepad1.a) {
-            armPosition = ARM_COLLAPSED_INTO_ROBOT;
-            wrist.setPosition(ARM_WINCH_ROBOT);
+            armPosition = ARM_WINCH_ROBOT;
+            wrist.setPosition(WRIST_FOLDED_IN);
         }
         else if (gamepad1.y) {
             armPosition = ARM_COLLECT;
@@ -158,9 +158,9 @@ public class IntoTheDeepExample extends OpMode
         ((DcMotorEx) armMotor).setVelocity(1800);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         if(gamepad1.right_stick_y > 0) {
-            armPosition += 0.35;
+            armPosition -= 10;
         } else if(gamepad1.right_stick_y < 0) {
-            armPosition -= 0.35;
+            armPosition += 10;
         }
         armMotor.setTargetPosition((int)armPosition);
 
@@ -179,9 +179,6 @@ public class IntoTheDeepExample extends OpMode
      */
     @Override
     public void stop() {
-        ((DcMotorEx) armMotor).setVelocity(800);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setTargetPosition((int)ARM_WINCH_ROBOT);
     }
 
 }
