@@ -143,9 +143,9 @@ public class IntoTheDeepLinearExample extends LinearOpMode {
 
 
         /* Define and Initialize Motors */
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_front_drive"); //the left drivetrain motor
-        rightDrive = hardwareMap.get(DcMotor.class, "right_front_drive"); //the right drivetrain motor
-        armMotor   = hardwareMap.get(DcMotor.class, "left_arm"); //the arm motor
+        leftDrive  = hardwareMap.get(DcMotor.class, "leftfront"); //the left drivetrain motor
+        rightDrive = hardwareMap.get(DcMotor.class, "rightfront"); //the right drivetrain motor
+        armMotor   = hardwareMap.get(DcMotor.class, "armmotor"); //the arm motor
 
 
         /* Most skid-steer/differential drive robots require reversing one motor to drive forward.
@@ -210,7 +210,7 @@ public class IntoTheDeepLinearExample extends LinearOpMode {
             max = Math.max(Math.abs(left), Math.abs(right));
             if (max > 1.0)
             {
-                left /= max;
+                left /= max; // left = left / max;
                 right /= max;
             }
 
@@ -258,47 +258,47 @@ public class IntoTheDeepLinearExample extends LinearOpMode {
                 armPosition = ARM_COLLECT;
                 wrist.setPosition(WRIST_FOLDED_OUT);
                 intake.setPower(INTAKE_COLLECT);
-                }
+            }
 
-                else if (gamepad1.left_bumper){
-                    /* This is about 20° up from the collecting position to clear the barrier
-                    Note here that we don't set the wrist position or the intake power when we
-                    select this "mode", this means that the intake and wrist will continue what
-                    they were doing before we clicked left bumper. */
-                    armPosition = ARM_CLEAR_BARRIER;
-                }
+            else if (gamepad1.left_bumper){
+                /* This is about 20° up from the collecting position to clear the barrier
+                Note here that we don't set the wrist position or the intake power when we
+                select this "mode", this means that the intake and wrist will continue what
+                they were doing before we clicked left bumper. */
+                armPosition = ARM_CLEAR_BARRIER;
+            }
 
-                else if (gamepad1.y){
-                    /* This is the correct height to score the sample in the LOW BASKET */
-                    armPosition = ARM_SCORE_SAMPLE_IN_LOW;
-                }
+            else if (gamepad1.y){
+                /* This is the correct height to score the sample in the LOW BASKET */
+                armPosition = ARM_SCORE_SAMPLE_IN_LOW;
+            }
 
-                else if (gamepad1.dpad_left) {
-                    /* This turns off the intake, folds in the wrist, and moves the arm
-                    back to folded inside the robot. This is also the starting configuration */
-                    armPosition = ARM_COLLAPSED_INTO_ROBOT;
-                    intake.setPower(INTAKE_OFF);
-                    wrist.setPosition(WRIST_FOLDED_IN);
-                }
+            else if (gamepad1.dpad_left) {
+                /* This turns off the intake, folds in the wrist, and moves the arm
+                back to folded inside the robot. This is also the starting configuration */
+                armPosition = ARM_COLLAPSED_INTO_ROBOT;
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_IN);
+            }
 
-                else if (gamepad1.dpad_right){
-                    /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
-                    armPosition = ARM_SCORE_SPECIMEN;
-                    wrist.setPosition(WRIST_FOLDED_IN);
-                }
+            else if (gamepad1.dpad_right){
+                /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
+                armPosition = ARM_SCORE_SPECIMEN;
+                wrist.setPosition(WRIST_FOLDED_IN);
+            }
 
-                else if (gamepad1.dpad_up){
-                    /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
-                    armPosition = ARM_ATTACH_HANGING_HOOK;
-                    intake.setPower(INTAKE_OFF);
-                    wrist.setPosition(WRIST_FOLDED_IN);
-                }
+            else if (gamepad1.dpad_up){
+                /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
+                armPosition = ARM_ATTACH_HANGING_HOOK;
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_IN);
+            }
 
-                else if (gamepad1.dpad_down){
-                    /* this moves the arm down to lift the robot up once it has been hooked */
-                    armPosition = ARM_WINCH_ROBOT;
-                    intake.setPower(INTAKE_OFF);
-                    wrist.setPosition(WRIST_FOLDED_IN);
+            else if (gamepad1.dpad_down){
+                /* this moves the arm down to lift the robot up once it has been hooked */
+                armPosition = ARM_WINCH_ROBOT;
+                intake.setPower(INTAKE_OFF);
+                wrist.setPosition(WRIST_FOLDED_IN);
             }
 
 
@@ -345,7 +345,6 @@ public class IntoTheDeepLinearExample extends LinearOpMode {
             if (((DcMotorEx) armMotor).isOverCurrent()){
                 telemetry.addLine("MOTOR EXCEEDED CURRENT LIMIT!");
             }
-
 
             /* send telemetry to the driver of the arm's current position and target position */
             telemetry.addData("armTarget: ", armMotor.getTargetPosition());
