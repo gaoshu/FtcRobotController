@@ -32,12 +32,12 @@ public class IntoTheDeepExample extends OpMode
                     * 1/360.0;
 
     final double ARM_COLLAPSED_INTO_ROBOT  = 0;
-    final double ARM_COLLECT               = 250 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT               = 200 * ARM_TICKS_PER_DEGREE;  // was 250, set to 200 for test
     final double ARM_CLEAR_BARRIER         = 230 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN        = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW   = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_ATTACH_HANGING_HOOK   = 120 * ARM_TICKS_PER_DEGREE;
-    final double ARM_WINCH_ROBOT           = 15  * ARM_TICKS_PER_DEGREE;
+    final double ARM_WINCH_ROBOT           = 30  * ARM_TICKS_PER_DEGREE;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
     final double INTAKE_COLLECT    = -1.0;
@@ -53,10 +53,7 @@ public class IntoTheDeepExample extends OpMode
 
      /* Variables that are used to set the arm to a specific position */
     double armPosition = (int)ARM_COLLAPSED_INTO_ROBOT;
-    double armPositionFudgeFactor;
-    double left;
-    double right;
-    double max;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -136,69 +133,36 @@ public class IntoTheDeepExample extends OpMode
         leftDrive.setPower(leftPower);
         rightDrive.setPower(rightPower);
 
+        // Arm y:collect, a:fold; Wrist x: fold in, b: fold out
         if (gamepad1.a) {
-            intake.setPower(INTAKE_COLLECT);
+            armPosition = ARM_COLLAPSED_INTO_ROBOT;
+            wrist.setPosition(ARM_WINCH_ROBOT);
+        }
+        else if (gamepad1.y) {
+            armPosition = ARM_COLLECT;
+            wrist.setPosition(WRIST_FOLDED_IN);
         }
         else if (gamepad1.x) {
-            intake.setPower(INTAKE_OFF);
+            wrist.setPosition(WRIST_FOLDED_IN);
         }
         else if (gamepad1.b) {
-            intake.setPower(INTAKE_DEPOSIT);
+            wrist.setPosition(WRIST_FOLDED_OUT);
         }
 
         if(gamepad1.right_bumper){
-            /* This is the intaking/collecting arm position */
-            armPosition = ARM_COLLECT;
-            wrist.setPosition(WRIST_FOLDED_OUT);
+            intake.setPower(INTAKE_DEPOSIT);
+        } else if(gamepad1.right_trigger > 0){
             intake.setPower(INTAKE_COLLECT);
         }
 
-        else if (gamepad1.left_bumper){
-                /* This is about 20° up from the collecting position to clear the barrier
-                Note here that we don't set the wrist position or the intake power when we
-                select this "mode", this means that the intake and wrist will continue what
-                they were doing before we clicked left bumper. */
-            armPosition = ARM_CLEAR_BARRIER;
-        }
-
-        else if (gamepad1.y){
-            /* This is the correct height to score the sample in the LOW BASKET */
-            armPosition = ARM_SCORE_SAMPLE_IN_LOW;
-        }
-
-        else if (gamepad1.dpad_left) {
-                /* This turns off the intake, folds in the wrist, and moves the arm
-                back to folded inside the robot. This is also the starting configuration */
-            armPosition = ARM_COLLAPSED_INTO_ROBOT;
-            intake.setPower(INTAKE_OFF);
-            wrist.setPosition(WRIST_FOLDED_IN);
-        }
-
-        else if (gamepad1.dpad_right){
-            /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
-            armPosition = ARM_SCORE_SPECIMEN;
-            wrist.setPosition(WRIST_FOLDED_IN);
-        }
-
-        else if (gamepad1.dpad_up){
-            /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
-            armPosition = ARM_ATTACH_HANGING_HOOK;
-            intake.setPower(INTAKE_OFF);
-            wrist.setPosition(WRIST_FOLDED_IN);
-        }
-
-        else if (gamepad1.dpad_down){
-            /* this moves the arm down to lift the robot up once it has been hooked */
-            armPosition = ARM_WINCH_ROBOT;
-            intake.setPower(INTAKE_OFF);
-            wrist.setPosition(WRIST_FOLDED_IN);
-        }
-        .
-        armPositionFudgeFactor = FUDGE_FACTOR * (gamepad1.right_trigger + (-gamepad1.left_trigger));
-        armMotor.setTargetPosition((int) (armPosition + armPositionFudgeFactor));
-
         ((DcMotorEx) armMotor).setVelocity(1800);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(gamepad1.right_stick_y > 0) {
+            armPosition += 0.35;
+        } else if(gamepad1.right_stick_y < 0) {
+            armPosition -= 0.35;
+        }
+        armMotor.setTargetPosition((int)armPosition);
 
         if (((DcMotorEx) armMotor).isOverCurrent()){
             telemetry.addLine("MOTOR EXCEEDED CURRENT LIMIT!");
@@ -215,6 +179,9 @@ public class IntoTheDeepExample extends OpMode
      */
     @Override
     public void stop() {
+        ((DcMotorEx) armMotor).setVelocity(800);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setTargetPosition((int)ARM_WINCH_ROBOT);
     }
 
 }
